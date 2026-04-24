@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["http://localhost:5173", "*gsutil cors set cors.json gs://YOUR_STORAGE_BUCKET"],
+    "method": ["GET", "POST", "PUT", "DELETE"],
+    "maxAgeSeconds": 3600
+  }
+]

@@ -6,7 +6,7 @@ import { getStorage } from "firebase/storage";
 
 // Replace with your Firebase project config
 const firebaseConfig = {
-  apiKey: "AIzaSyCsQmrGr2oVm0txuAJhNXAYY4B6B8CkUkE",
+  apiKey: "null",
   authDomain: "fps-photobooth.firebaseapp.com",
   projectId: "fps-photobooth",
   storageBucket: "fps-photobooth.firebasestorage.app",
@@ -24,5 +24,4 @@ export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
 googleProvider.setCustomParameters({
-  hd: "cfd.nu.edu.pk", // Restrict to university domain
 });
