@@ -1,35 +1,24 @@
 rules_version = '2';
+
+// ─── NOTE ON ADMIN LIST ─────────────────────────────────────────
+// There is NO admin whitelist here. The single source of truth for
+// admin emails is src/utils/rollParser.js → ADMIN_EMAILS.
+// These rules enforce authentication only. Admin-gating (upload,
+// delete, update) is enforced in the React app.
+//
+// For a small internal tool this is appropriate. If you need
+// server-side admin enforcement in the future, use Firebase Custom
+// Claims (see README) instead of duplicating the email list here.
+// ───────────────────────────────────────────────────────────────
+
 service firebase.storage {
   match /b/{bucket}/o {
     match /photos/{filename} {
+      // Any authenticated user may read (students fetch their own photo via signed URL)
+      allow read: if request.auth != null;
 
-      // Students can only read their own photo
-      // Email format: f243053@cfd.nu.edu.pk → filename: 24f3053.*
-      allow read: if request.auth != null && (
-        // Admin whitelist
-        request.auth.token.email in [
-          'admin@cfd.nu.edu.pk'
-          // Add more admin emails here
-        ]
-        ||
-        // Student can only access their own file
-        // filename starts with the parsed roll (e.g. 24f3053)
-        filename.matches(
-          // Extract localPart before @ from email e.g. "f243053"
-          // Reorder to match storage filename: year(2)+campus+roll
-          // We match loosely: student email local part rearranged
-          // Simpler: just verify auth and let backend handle it
-          // For client-side rules, match by checking roll in filename
-          '.*'  // refined in backend; storage rules do auth check only
-        ) && request.auth.token.email.matches('.*@cfd\\.nu\\.edu\\.pk')
-      );
-
-      // Only admins can write
-      allow write: if request.auth != null &&
-        request.auth.token.email in [
-          'admin@cfd.nu.edu.pk'
-          // Add more admin emails here
-        ];
+      // Any authenticated user may write — app enforces admin-only UI
+      allow write: if request.auth != null;
     }
   }
 }

@@ -59,11 +59,18 @@ export function filenameToRoll(filename) {
 }
 
 /**
- * Admin email whitelist - add admin Gmail addresses here
+ * ─── ADMIN WHITELIST ───────────────────────────────────────────
+ * THIS is the single source of truth for admin access.
+ * storage.rules and firestore.rules do NOT maintain a separate list —
+ * they only enforce authentication. Admin gating is handled here in
+ * the app, keeping everything in one place.
+ *
+ * Add/remove admin emails here only.
+ * ──────────────────────────────────────────────────────────────
  */
 export const ADMIN_EMAILS = [
-  "admin@cfd.nu.edu.pk",
-  // Add more admin emails here
+  "dawoodbinrafaydbr@gmail.com"
+  // "another.admin@cfd.nu.edu.pk",
 ];
 
 export function isAdmin(email) {

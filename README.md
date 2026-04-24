@@ -43,16 +43,16 @@ const firebaseConfig = {
 
 ### 3. Set Admin Emails
 
-Edit `src/utils/rollParser.js`:
+Edit **one file only**: `src/utils/rollParser.js`:
 
 ```js
 export const ADMIN_EMAILS = [
-  "youremail@gmail.com",   // or your university email
+  "youremail@gmail.com",
   // add more admins
 ];
 ```
 
-Also update the same list in `storage.rules` and `firestore.rules`.
+That's the single source of truth. `storage.rules` and `firestore.rules` enforce authentication only — no duplicate list to maintain.
 
 ### 4. Deploy Storage Rules
 

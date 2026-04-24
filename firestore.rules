@@ -1,24 +1,20 @@
 rules_version = '2';
+
+// ─── NOTE ON ADMIN LIST ─────────────────────────────────────────
+// There is NO admin whitelist here. The single source of truth for
+// admin emails is src/utils/rollParser.js → ADMIN_EMAILS.
+// These rules enforce authentication only.
+// ───────────────────────────────────────────────────────────────
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Admin list - update this to match your actual admins
-    function isAdmin() {
-      return request.auth.token.email in [
-        'admin@cfd.nu.edu.pk'
-        // Add more admin emails here
-      ];
-    }
-
-    function isUniversityEmail() {
-      return request.auth.token.email.matches('.*@cfd\\.nu\\.edu\\.pk');
-    }
-
     match /students/{rollNumber} {
-      allow read: if request.auth != null && (
-        isAdmin() || (isUniversityEmail() && resource.id == rollNumber)
-      );
-      allow write: if request.auth != null && isAdmin();
+      // Any authenticated user can read — app shows only their own data
+      allow read: if request.auth != null;
+
+      // Any authenticated user can write — app enforces admin-only UI
+      allow write: if request.auth != null;
     }
   }
 }
