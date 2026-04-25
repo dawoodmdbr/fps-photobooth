@@ -15,6 +15,30 @@ A web app where students log in with their university email and view/download th
 
 ---
 
+## Features
+
+**Student**
+- Sign in with university Google account (`@cfd.nu.edu.pk`)
+- Automatically fetches their own photo using their roll number
+- Preview their official university photograph
+- One-click download in original high resolution
+
+**Admin**
+- Sign in with any whitelisted email (not restricted to university domain)
+- Batch upload hundreds of photos at once via drag & drop
+- Photos are automatically mapped to students by filename (`24f3053.jpg`)
+- Update any student's photo individually
+- Delete any student's photo
+- Search students by roll number
+
+**General**
+- No manual roll number entry — parsed automatically from email
+- Supports `.jpg`, `.jpeg`, `.png`, `.webp` formats
+- Persistent cloud storage via Cloudinary (no data loss on server restart)
+- Fully responsive on mobile and desktop
+
+---
+
 ## Project Structure
 
 ```
