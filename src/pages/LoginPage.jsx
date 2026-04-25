@@ -5,13 +5,13 @@ export default function LoginPage() {
 
   return (
     <div className="login-root">
-      {/* Decorative background */}
+      {/* Decorative background
       <div className="login-bg">
         <div className="login-bg-circle c1" />
         <div className="login-bg-circle c2" />
         <div className="login-bg-circle c3" />
         <div className="login-grid" />
-      </div>
+      </div> */}
 
       <div className="login-card">
         {/* Logo placeholder */}
