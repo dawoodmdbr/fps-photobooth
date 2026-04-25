@@ -13,7 +13,11 @@ const BASE_URL = process.env.BASE_URL || "https://fps-photobooth.onrender.com";
 if (!fs.existsSync(PHOTOS_DIR)) fs.mkdirSync(PHOTOS_DIR);
 
 const app = express();
-app.use(cors({ origin: "https://fps-photobooth.vercel.app" }));
+app.use(cors({
+  origin: "https://fps-photobooth.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: false,
+}));
 app.use(express.json());
 
 // Serve photos statically
