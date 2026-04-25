@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { filenameToRoll } from "../utils/rollParser";
 
-const API = "https://fps-photobooth.onrender.com/";
+const API = "https://fps-photobooth.onrender.com";
 
 export default function AdminPage() {
   const { logout } = useAuth();

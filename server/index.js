@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PHOTOS_DIR = path.join(__dirname, "photos");
-const BASE_URL = process.env.BASE_URL || "https://fps-photobooth.onrender.com/";
+const BASE_URL = process.env.BASE_URL || "https://fps-photobooth.onrender.com";
 
 // Ensure photos directory exists
 if (!fs.existsSync(PHOTOS_DIR)) fs.mkdirSync(PHOTOS_DIR);

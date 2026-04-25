@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { rollToFilename } from "../utils/rollParser";
 
-const API = "https://fps-photobooth.onrender.com/";
+const API = "https://fps-photobooth.onrender.com";
 
 async function findImageData(rollNumber) {
   const filename = rollToFilename(rollNumber);
