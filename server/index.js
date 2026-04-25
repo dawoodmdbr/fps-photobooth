@@ -7,12 +7,13 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PHOTOS_DIR = path.join(__dirname, "photos");
+const BASE_URL = process.env.BASE_URL || "https://fps-photobooth.onrender.com/";
 
 // Ensure photos directory exists
 if (!fs.existsSync(PHOTOS_DIR)) fs.mkdirSync(PHOTOS_DIR);
 
 const app = express();
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: "https://fps-photobooth.vercel.app/" }));
 app.use(express.json());
 
 // Serve photos statically
@@ -33,7 +34,7 @@ app.get("/api/photo/:roll", (req, res) => {
   for (const ext of EXTENSIONS) {
     const filePath = path.join(PHOTOS_DIR, `${roll}.${ext}`);
     if (fs.existsSync(filePath)) {
-      return res.json({ url: `http://localhost:3001/photos/${roll}.${ext}`, filename: `${roll}.${ext}` });
+      return res.json({ url: `${BASE_URL}/photos/${roll}.${ext}`, filename: `${roll}.${ext}` });
     }
   }
   return res.status(404).json({ error: "Photo not found" });
@@ -46,7 +47,7 @@ app.get("/api/students", (req, res) => {
   );
   const students = files.map((filename) => ({
     filename,
-    url: `http://localhost:3001/photos/${filename}`,
+    url: `${BASE_URL}/photos/${filename}`,
   }));
   res.json(students);
 });
@@ -80,5 +81,5 @@ app.delete("/api/delete/:filename", (req, res) => {
   res.json({ status: "deleted" });
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`FPS backend running at http://localhost:${PORT}`));
