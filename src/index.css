@@ -382,7 +382,7 @@ body {
 
 .photo-frame {
   position: relative;
-  width: 260px;
+  width: 300px;
   height: 300px;
   border-radius: var(--radius-lg);
   overflow: hidden;

@@ -1,23 +1,15 @@
 import { useEffect, useState, useRef } from "react";
-import {
-  ref,
-  uploadBytes,
-  deleteObject,
-  listAll,
-  getDownloadURL,
-} from "firebase/storage";
-import { storage } from "../firebase/config";
 import { useAuth } from "../hooks/useAuth";
 import { filenameToRoll } from "../utils/rollParser";
 
-const PHOTOS_PATH = "photos";
+const API = "http://localhost:3001";
 
 export default function AdminPage() {
   const { logout } = useAuth();
   const [students, setStudents] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [search, setSearch] = useState("");
-  const [actionState, setActionState] = useState({}); // { filename: 'loading' | 'done' }
+  const [actionState, setActionState] = useState({});
   const [batchFiles, setBatchFiles] = useState([]);
   const [batchUploading, setBatchUploading] = useState(false);
   const [batchResults, setBatchResults] = useState([]);
@@ -26,18 +18,15 @@ export default function AdminPage() {
   const fetchStudents = async () => {
     setLoadingList(true);
     try {
-      const listRef = ref(storage, PHOTOS_PATH);
-      const res = await listAll(listRef);
-      const items = await Promise.all(
-        res.items.map(async (item) => {
-          const filename = item.name;
-          const nameNoExt = filename.replace(/\.[^/.]+$/, "");
-          let url = null;
-          try { url = await getDownloadURL(item); } catch {}
-          return { filename, nameNoExt, roll: filenameToRoll(nameNoExt), url, ref: item };
-        })
-      );
-      setStudents(items.sort((a, b) => a.roll.localeCompare(b.roll)));
+      const res = await fetch(`${API}/api/students`);
+      const items = await res.json();
+      const enriched = items.map(({ filename, url }) => ({
+        filename,
+        url,
+        nameNoExt: filename.replace(/\.[^/.]+$/, ""),
+        roll: filenameToRoll(filename.replace(/\.[^/.]+$/, "")),
+      }));
+      setStudents(enriched.sort((a, b) => a.roll.localeCompare(b.roll)));
     } catch (e) {
       console.error(e);
     }
@@ -50,7 +39,8 @@ export default function AdminPage() {
     if (!confirm(`Delete photo for ${student.roll}? This cannot be undone.`)) return;
     setActionState((s) => ({ ...s, [student.filename]: "loading" }));
     try {
-      await deleteObject(student.ref);
+      const res = await fetch(`${API}/api/delete/${student.filename}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
       setStudents((prev) => prev.filter((s) => s.filename !== student.filename));
     } catch (e) {
       alert("Delete failed: " + e.message);
@@ -58,20 +48,20 @@ export default function AdminPage() {
     setActionState((s) => { const n = { ...s }; delete n[student.filename]; return n; });
   };
 
-  const handleUpdate = async (student) => {
-    const input = updateInputRefs.current[student.filename];
-    const file = input?.files?.[0];
-    if (!file) return alert("Please select a file first.");
-
-    const ext = file.name.split(".").pop().toLowerCase();
-    const newRef = ref(storage, `${PHOTOS_PATH}/${student.nameNoExt}.${ext}`);
+  const handleUpdate = async (student, file) => {
+    if (!file) return;
     setActionState((s) => ({ ...s, [student.filename]: "loading" }));
     try {
-      // Delete old if extension changed
-      if (ext !== student.filename.split(".").pop()) {
-        try { await deleteObject(student.ref); } catch {}
-      }
-      await uploadBytes(newRef, file);
+      const formData = new FormData();
+      // Keep the same base name, use new extension
+      const ext = file.name.split(".").pop().toLowerCase();
+      const newFile = new File([file], `${student.nameNoExt}.${ext}`, { type: file.type });
+      formData.append("photo", newFile);
+      const res = await fetch(`${API}/api/update/${student.filename}`, {
+        method: "PUT",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Update failed");
       await fetchStudents();
     } catch (e) {
       alert("Update failed: " + e.message);
@@ -84,22 +74,25 @@ export default function AdminPage() {
     setBatchUploading(true);
     setBatchResults([]);
 
-    const results = [];
-    for (const file of batchFiles) {
-      const nameNoExt = file.name.replace(/\.[^/.]+$/, "").toLowerCase();
-      const roll = filenameToRoll(nameNoExt);
-      try {
-        const fileRef = ref(storage, `${PHOTOS_PATH}/${file.name.toLowerCase()}`);
-        await uploadBytes(fileRef, file);
-        results.push({ filename: file.name, roll, status: "success" });
-      } catch (e) {
-        results.push({ filename: file.name, roll, status: "error", msg: e.message });
-      }
+    const formData = new FormData();
+    batchFiles.forEach((f) => formData.append("photos", f, f.name.toLowerCase()));
+
+    try {
+      const res = await fetch(`${API}/api/upload`, { method: "POST", body: formData });
+      const results = await res.json();
+      setBatchResults(
+        results.map((r) => ({
+          filename: r.filename,
+          roll: filenameToRoll(r.filename.replace(/\.[^/.]+$/, "")),
+          status: r.status,
+        }))
+      );
+      await fetchStudents();
+    } catch (e) {
+      setBatchResults([{ filename: "Upload failed", roll: "", status: "error", msg: e.message }]);
     }
-    setBatchResults(results);
     setBatchUploading(false);
     setBatchFiles([]);
-    await fetchStudents();
   };
 
   const filtered = students.filter(
@@ -269,7 +262,7 @@ export default function AdminPage() {
                         id={`upd-${student.filename}`}
                         style={{ display: "none" }}
                         ref={(el) => (updateInputRefs.current[student.filename] = el)}
-                        onChange={() => handleUpdate(student)}
+                        onChange={(e) => handleUpdate(student, e.target.files[0])}
                       />
                       <label htmlFor={`upd-${student.filename}`} className="action-btn update-btn">
                         {actionState[student.filename] === "loading" ? (

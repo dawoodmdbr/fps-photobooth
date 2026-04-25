@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
-import { ref, getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase/config";
 import { useAuth } from "../hooks/useAuth";
 import { rollToFilename } from "../utils/rollParser";
 
-const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
+const API = "http://localhost:3001";
 
-async function findImageURL(rollNumber) {
+async function findImageData(rollNumber) {
   const filename = rollToFilename(rollNumber);
-  for (const ext of IMAGE_EXTENSIONS) {
-    try {
-      const imageRef = ref(storage, `photos/${filename}.${ext}`);
-      const url = await getDownloadURL(imageRef);
-      return { url, filename: `${filename}.${ext}` };
-    } catch {
-      // try next extension
-    }
-  }
-  return null;
+  const res = await fetch(`${API}/api/photo/${filename}`);
+  if (!res.ok) return null;
+  return await res.json(); // { url, filename }
 }
 
 export default function StudentPage() {
@@ -29,7 +20,7 @@ export default function StudentPage() {
     if (!user?.rollNumber) return;
     setStatus("loading");
 
-    findImageURL(user.rollNumber)
+    findImageData(user.rollNumber)
       .then((data) => {
         if (data) {
           setImageData(data);

@@ -14,16 +14,16 @@ export function isValidUniversityEmail(email) {
  * @returns {string|null}
  */
 export function parseRollNumber(email) {
-  if (!isValidUniversityEmail(email)) return null;
+  if (!isValidUniversityEmail(email) && !isAdmin(email)) return null;
 
-  const localPart = email.split("@")[0]; // e.g. "f243053"
+  const localPart = email.split("@")[0]; // "f243053"
 
-  // Pattern: optional letter prefix, 2-digit year, campus letter, roll digits
-  // e.g. f243053 → year=24, campus=f, roll=3053
-  const match = localPart.match(/^([a-zA-Z]?)(\d{2})([a-zA-Z])(\d+)$/);
+  // Format: campus_letter + 2_digit_year + roll_number
+  // e.g. f243053 → campus=f, year=24, roll=3053
+  const match = localPart.match(/^([a-zA-Z])(\d{2})(\d+)$/);
   if (!match) return null;
 
-  const [, , year, campus, roll] = match;
+  const [, campus, year, roll] = match;
   return `${year}${campus.toUpperCase()}-${roll}`; // → "24F-3053"
 }
 
@@ -69,7 +69,7 @@ export function filenameToRoll(filename) {
  * ──────────────────────────────────────────────────────────────
  */
 export const ADMIN_EMAILS = [
-  "dawoodbinrafaydbr@gmail.com"
+  "dawoodbinrafaydbr@gmail.com",
   // "another.admin@cfd.nu.edu.pk",
 ];
 
