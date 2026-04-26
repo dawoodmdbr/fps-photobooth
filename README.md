@@ -64,6 +64,26 @@ fps-photobooth/
 └── vite.config.js
 ```
 
+
+---
+
+## 📸 Screenshots
+
+### Login Page
+<p align="center">
+  <img width="1919" height="914" alt="image" src="https://github.com/user-attachments/assets/24eaa7fc-5a5e-4b5c-827c-960a3a747495" />
+</p>
+
+### Student view
+<p align="center">
+  <img width="1919" height="914" alt="image" src="https://github.com/user-attachments/assets/d1c01f26-86ee-41f3-a171-3bc7b460c0b7" />
+</p>
+
+### Admin view
+<p align="center">
+  <img width="1906" height="914" alt="image" src="https://github.com/user-attachments/assets/768b5920-04bc-48be-8a9a-0f69c37312b6" />
+</p>
+
 ---
 
 ## Local Development
